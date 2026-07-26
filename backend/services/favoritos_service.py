@@ -26,6 +26,15 @@ def agregar_favorito(usuario_id, contenido_id):
         }
 
     cursor.execute("""
+        DELETE FROM dislike
+        WHERE usuario_id=%s
+        AND contenido_id=%s
+    """, (
+        usuario_id,
+        contenido_id
+    ))
+
+    cursor.execute("""
         INSERT INTO favorito(usuario_id, contenido_id)
         VALUES(%s,%s)
     """, (
@@ -42,6 +51,7 @@ def agregar_favorito(usuario_id, contenido_id):
         "success": True,
         "mensaje": "Película agregada a favoritos."
     }
+
 
 def obtener_favoritos(usuario_id):
 
