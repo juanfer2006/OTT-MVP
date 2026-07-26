@@ -1,15 +1,20 @@
 from flask import Flask
-from rutas.regiones import regiones_bp
+
+from routes.regiones import regiones_bp
+from routes.auth import auth_bp
 
 app = Flask(__name__)
 
 app.register_blueprint(regiones_bp)
+app.register_blueprint(auth_bp)
+
 
 @app.route("/")
 def inicio():
     return {
-        "mensaje": "Backend OTT funcionando correctamente 🚀"
+        "mensaje": "Backend OTT funcionando correctamente"
     }
+
 
 if __name__ == "__main__":
     app.run(debug=True)
