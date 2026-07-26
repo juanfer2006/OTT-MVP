@@ -1,23 +1,15 @@
 from flask import Flask
-from database_connection import obtener_conexion
+from rutas.regiones import regiones_bp
 
 app = Flask(__name__)
 
+app.register_blueprint(regiones_bp)
+
 @app.route("/")
 def inicio():
-    try:
-        conexion = obtener_conexion()
-        conexion.close()
-
-        return {
-            "mensaje": "Backend conectado correctamente con MySQL"
-        }
-
-    except Exception as e:
-        return {
-            "error": str(e)
-        }, 500
-
+    return {
+        "mensaje": "Backend OTT funcionando correctamente 🚀"
+    }
 
 if __name__ == "__main__":
     app.run(debug=True)
