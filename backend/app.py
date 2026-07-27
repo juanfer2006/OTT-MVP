@@ -5,11 +5,13 @@ from routes.auth import auth_bp
 from routes.favoritos import favoritos_bp
 from routes.historial import historial_bp
 from routes.dislikes import dislikes_bp
+from routes.contenido import contenido_bp
 
 app = Flask(__name__)
 
 app.register_blueprint(regiones_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(contenido_bp)
 app.register_blueprint(dislikes_bp)
 app.register_blueprint(historial_bp)
 app.register_blueprint(favoritos_bp)
