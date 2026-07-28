@@ -7,31 +7,28 @@ No realiza ninguna petición a un backend/API todavía.
 ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+if (isAuthenticated()) {
+    window.location.replace("home.html");
+    return;
+}
+
 const form = document.getElementById("loginForm");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const togglePasswordBtn = document.getElementById("togglePassword");
 const loginBtn = document.getElementById("loginBtn");
+const rememberCheckbox = document.getElementById("remember");
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/* ------------------------------------------------------------------ *
-* Mostrar / ocultar contraseña
-* ------------------------------------------------------------------ */
 togglePasswordBtn.addEventListener("click", () => {
     const isHidden = passwordInput.type === "password";
 
     passwordInput.type = isHidden ? "text" : "password";
     togglePasswordBtn.setAttribute("aria-pressed", String(isHidden));
-    togglePasswordBtn.setAttribute(
-    "aria-label",
-    isHidden ? "Ocultar contraseña" : "Mostrar contraseña"
-    );
+    togglePasswordBtn.setAttribute("aria-label", isHidden ? "Ocultar contraseña" : "Mostrar contraseña");
 });
 
-/* ------------------------------------------------------------------ *
-* Utilidades de validación
-* ------------------------------------------------------------------ */
 function setError(fieldName, message) {
     const group = form.querySelector(`[data-field="${fieldName}"]`);
     const errorEl = document.getElementById(`${fieldName}Error`);
@@ -81,7 +78,6 @@ function validatePassword() {
     return true;
 }
 
-/* Limpia el error apenas el usuario empieza a corregir el campo */
 emailInput.addEventListener("input", () => {
     if (emailInput.value.trim() !== "") clearError("email");
 });
@@ -90,9 +86,6 @@ passwordInput.addEventListener("input", () => {
     if (passwordInput.value.trim() !== "") clearError("password");
 });
 
-/* ------------------------------------------------------------------ *
-* Envío del formulario (solo validación de interfaz por ahora)
-* ------------------------------------------------------------------ */
 form.addEventListener("submit", (event) => {
     event.preventDefault();
 
@@ -105,20 +98,20 @@ form.addEventListener("submit", (event) => {
     return;
     }
 
-    // Estado de carga simulado en la interfaz.
-    // La conexión real con el backend (Flask + JWT) se integrará más adelante en api.js.
+    const user = authenticateUser(emailInput.value.trim(), passwordInput.value);
+
+    if (!user) {
+    setError("password", "Correo o contraseña incorrectos.");
+    return;
+    }
+
     loginBtn.classList.add("is-loading");
     loginBtn.disabled = true;
 
-    setTimeout(() => {
-    loginBtn.classList.remove("is-loading");
-    loginBtn.disabled = false;
+    saveSession({ ...user, remember: rememberCheckbox.checked });
 
-    console.log("Formulario válido. Datos listos para enviar al backend:", {
-        email: emailInput.value.trim(),
-        password: passwordInput.value,
-        remember: document.getElementById("remember").checked,
-    });
-    }, 900);
+    setTimeout(() => {
+    window.location.href = "home.html";
+    }, 700);
 });
 });
