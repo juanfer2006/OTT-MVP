@@ -13,11 +13,13 @@ from routes.categoria_routes import categoria_bp
 from routes.seguir_viendo_routes import seguir_viendo_bp
 from routes.recuperar_contrasena_routes import recuperar_contrasena_bp
 from routes.cerrar_sesion_routes import cerrar_sesion_bp
+from routes.perfil import perfil_bp
 
 app = Flask(__name__)
 
 app.register_blueprint(regiones_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(perfil_bp)   
 app.register_blueprint(recuperar_contrasena_bp)
 app.register_blueprint(categoria_bp)
 app.register_blueprint(busqueda_bp)
