@@ -1,48 +1,38 @@
-/* ==========================================================================
-StreamFlix · registro.js
-Maneja únicamente la interfaz del formulario de registro:
-    - Mostrar / ocultar contraseña (en ambos campos)
-    - Validar nombre, correo, contraseña, confirmación, región y términos
-    - Simular la creación de cuenta (sin fetch, sin backend todavía)
-La integración real con Flask + JWT se hará más adelante en api.js.
-========================================================================== */
-
 document.addEventListener("DOMContentLoaded", () => {
-if (isAuthenticated()) {
+  if (isAuthenticated()) {
     window.location.replace("home.html");
     return;
-}
+  }
 
-const form = document.getElementById("registerForm");
-const registerBtn = document.getElementById("registerBtn");
-const formSuccess = document.getElementById("formSuccess");
+  const form = document.getElementById("registerForm");
+  const registerBtn = document.getElementById("registerBtn");
+  const formSuccess = document.getElementById("formSuccess");
 
-const nombreInput = document.getElementById("nombre");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const confirmPasswordInput = document.getElementById("confirmPassword");
-const regionSelect = document.getElementById("region");
-const termsCheckbox = document.getElementById("terms");
+  const nombreInput = document.getElementById("nombre");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const confirmPasswordInput = document.getElementById("confirmPassword");
+  const regionSelect = document.getElementById("region");
+  const termsCheckbox = document.getElementById("terms");
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MIN_PASSWORD_LENGTH = 8;
-const REDIRECT_URL = "home.html";
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const MIN_PASSWORD_LENGTH = 8;
+  const REDIRECT_URL = "home.html";
 
-document.querySelectorAll(".toggle-password").forEach((toggleBtn) => {
+  document.querySelectorAll(".toggle-password").forEach((toggleBtn) => {
     toggleBtn.addEventListener("click", () => {
-    const targetId = toggleBtn.getAttribute("data-target");
-    const targetInput = document.getElementById(targetId);
-    if (!targetInput) return;
+      const targetId = toggleBtn.getAttribute("data-target");
+      const targetInput = document.getElementById(targetId);
+      if (!targetInput) return;
 
-    const isHidden = targetInput.type === "password";
-
-    targetInput.type = isHidden ? "text" : "password";
-    toggleBtn.setAttribute("aria-pressed", String(isHidden));
-    toggleBtn.setAttribute("aria-label", isHidden ? "Ocultar contraseña" : "Mostrar contraseña");
+      const isHidden = targetInput.type === "password";
+      targetInput.type = isHidden ? "text" : "password";
+      toggleBtn.setAttribute("aria-pressed", String(isHidden));
+      toggleBtn.setAttribute("aria-label", isHidden ? "Ocultar contraseña" : "Mostrar contraseña");
     });
-});
+  });
 
-function setError(fieldName, message) {
+  function setError(fieldName, message) {
     const group = form.querySelector(`[data-field="${fieldName}"]`);
     const errorEl = document.getElementById(`${fieldName}Error`);
 
@@ -50,9 +40,9 @@ function setError(fieldName, message) {
 
     group.classList.add("has-error");
     errorEl.textContent = message;
-}
+  }
 
-function clearError(fieldName) {
+  function clearError(fieldName) {
     const group = form.querySelector(`[data-field="${fieldName}"]`);
     const errorEl = document.getElementById(`${fieldName}Error`);
 
@@ -60,176 +50,177 @@ function clearError(fieldName) {
 
     group.classList.remove("has-error");
     errorEl.textContent = "";
-}
+  }
 
-function validateNombre() {
+  function validateNombre() {
     const value = nombreInput.value.trim();
 
     if (value === "") {
-    setError("nombre", "Ingresa tu nombre completo.");
-    return false;
+      setError("nombre", "Ingresa tu nombre completo.");
+      return false;
     }
 
     if (value.length < 3) {
-    setError("nombre", "El nombre debe tener al menos 3 caracteres.");
-    return false;
+      setError("nombre", "El nombre debe tener al menos 3 caracteres.");
+      return false;
     }
 
     clearError("nombre");
     return true;
-}
+  }
 
-function validateEmail() {
+  function validateEmail() {
     const value = emailInput.value.trim();
 
     if (value === "") {
-    setError("email", "Ingresa tu correo electrónico.");
-    return false;
+      setError("email", "Ingresa tu correo electrónico.");
+      return false;
     }
 
     if (!EMAIL_REGEX.test(value)) {
-    setError("email", "Ingresa un correo electrónico válido.");
-    return false;
+      setError("email", "Ingresa un correo electrónico válido.");
+      return false;
     }
 
     clearError("email");
     return true;
-}
+  }
 
-function validatePassword() {
+  function validatePassword() {
     const value = passwordInput.value;
 
     if (value === "") {
-    setError("password", "Ingresa una contraseña.");
-    return false;
+      setError("password", "Ingresa una contraseña.");
+      return false;
     }
 
     if (value.length < MIN_PASSWORD_LENGTH) {
-    setError("password", `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`);
-    return false;
+      setError("password", `La contraseña debe tener al menos ${MIN_PASSWORD_LENGTH} caracteres.`);
+      return false;
     }
 
     clearError("password");
     return true;
-}
+  }
 
-function validateConfirmPassword() {
+  function validateConfirmPassword() {
     const value = confirmPasswordInput.value;
 
     if (value === "") {
-    setError("confirmPassword", "Confirma tu contraseña.");
-    return false;
+      setError("confirmPassword", "Confirma tu contraseña.");
+      return false;
     }
 
     if (value !== passwordInput.value) {
-    setError("confirmPassword", "Las contraseñas no coinciden.");
-    return false;
+      setError("confirmPassword", "Las contraseñas no coinciden.");
+      return false;
     }
 
     clearError("confirmPassword");
     return true;
-}
+  }
 
-function validateRegion() {
+  function validateRegion() {
     if (regionSelect.value === "") {
-    setError("region", "Selecciona tu región.");
-    return false;
+      setError("region", "Selecciona tu región.");
+      return false;
     }
 
     clearError("region");
     return true;
-}
+  }
 
-function validateTerms() {
+  function validateTerms() {
     if (!termsCheckbox.checked) {
-    setError("terms", "Debes aceptar los términos y condiciones.");
-    return false;
+      setError("terms", "Debes aceptar los términos y condiciones.");
+      return false;
     }
 
     clearError("terms");
     return true;
-}
+  }
 
-nombreInput.addEventListener("input", () => {
+  nombreInput.addEventListener("input", () => {
     if (nombreInput.value.trim() !== "") clearError("nombre");
-});
+  });
 
-emailInput.addEventListener("input", () => {
+  emailInput.addEventListener("input", () => {
     if (emailInput.value.trim() !== "") clearError("email");
-});
+  });
 
-passwordInput.addEventListener("input", () => {
+  passwordInput.addEventListener("input", () => {
     if (passwordInput.value !== "") clearError("password");
     if (confirmPasswordInput.value !== "") validateConfirmPassword();
-});
+  });
 
-confirmPasswordInput.addEventListener("input", () => {
+  confirmPasswordInput.addEventListener("input", () => {
     if (confirmPasswordInput.value !== "") clearError("confirmPassword");
-});
+  });
 
-regionSelect.addEventListener("change", () => clearError("region"));
+  regionSelect.addEventListener("change", () => clearError("region"));
 
-termsCheckbox.addEventListener("change", () => {
+  termsCheckbox.addEventListener("change", () => {
     if (termsCheckbox.checked) clearError("terms");
-});
+  });
 
-form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const validations = [
-    validateNombre(),
-    validateEmail(),
-    validatePassword(),
-    validateConfirmPassword(),
-    validateRegion(),
-    validateTerms(),
+      validateNombre(),
+      validateEmail(),
+      validatePassword(),
+      validateConfirmPassword(),
+      validateRegion(),
+      validateTerms()
     ];
 
     const isFormValid = validations.every(Boolean);
 
     if (!isFormValid) {
-    const firstInvalidGroup = form.querySelector(".has-error");
-    if (firstInvalidGroup) {
+      const firstInvalidGroup = form.querySelector(".has-error");
+      if (firstInvalidGroup) {
         const focusable = firstInvalidGroup.querySelector("input, select");
         if (focusable) focusable.focus();
-    }
-    return;
+      }
+      return;
     }
 
-    simulateAccountCreation();
-});
-
-function simulateAccountCreation() {
     const btnLabel = registerBtn.querySelector("span");
 
     registerBtn.disabled = true;
     registerBtn.classList.add("is-loading");
     btnLabel.textContent = "Creando cuenta...";
 
-    const createdUser = registerUser({
-    nombre: nombreInput.value.trim(),
-    email: emailInput.value.trim(),
-    password: passwordInput.value,
-    region: regionSelect.value,
-    });
+    try {
+      const createdUser = await registerUser({
+        nombre: nombreInput.value.trim(),
+        email: emailInput.value.trim(),
+        password: passwordInput.value,
+        region: regionSelect.value
+      });
 
-    if (!createdUser) {
-    registerBtn.classList.remove("is-loading");
-    registerBtn.disabled = false;
-    btnLabel.textContent = "Crear cuenta";
-    setError("email", "Este correo ya está registrado.");
-    return;
-    }
+      if (!createdUser || (!createdUser.email && !createdUser.correo)) {
+        registerBtn.classList.remove("is-loading");
+        registerBtn.disabled = false;
+        btnLabel.textContent = "Crear cuenta";
+        setError("email", "No se pudo crear la cuenta.");
+        return;
+      }
 
-    setTimeout(() => {
-    registerBtn.classList.remove("is-loading");
-    registerBtn.classList.add("is-success");
-    btnLabel.textContent = "¡Cuenta creada!";
-    formSuccess.classList.add("is-visible");
+      registerBtn.classList.remove("is-loading");
+      registerBtn.classList.add("is-success");
+      btnLabel.textContent = "¡Cuenta creada!";
+      formSuccess.classList.add("is-visible");
 
-    setTimeout(() => {
+      setTimeout(() => {
         window.location.href = REDIRECT_URL;
-    }, 1000);
-    }, 1000);
-}
+      }, 1000);
+    } catch (error) {
+      registerBtn.classList.remove("is-loading");
+      registerBtn.disabled = false;
+      btnLabel.textContent = "Crear cuenta";
+      setError("email", error.message || "No se pudo crear la cuenta.");
+    }
+  });
 });

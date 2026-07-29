@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   if (!isAuthenticated()) {
     window.location.replace("index.html");
     return;
@@ -14,16 +14,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileRegion = document.getElementById("profile-region");
   const profileWatchtime = document.getElementById("profile-watchtime");
 
-  if (session) {
-    const name = session.nombre || session.email?.split("@")[0] || "Usuario";
-    const email = session.email || "usuario@streamhub.com";
+  function renderProfile(data) {
+    const name = data?.nombre || data?.name || data?.email?.split("@")[0] || session?.nombre || session?.name || "Usuario";
+    const email = data?.email || data?.correo || session?.email || session?.correo || "usuario@streamhub.com";
+    const region = data?.region || data?.pais || session?.region || "Colombia";
 
     if (profileName) profileName.textContent = name;
     if (profileEmail) profileEmail.textContent = email;
     if (profileNameDetail) profileNameDetail.textContent = name;
     if (profileEmailDetail) profileEmailDetail.textContent = email;
-    if (profilePlan) profilePlan.textContent = "Plan Básico";
-    if (profileRegion) profileRegion.textContent = session.region || "Colombia";
-    if (profileWatchtime) profileWatchtime.textContent = "12h";
+    if (profilePlan) profilePlan.textContent = data?.plan || "Plan Básico";
+    if (profileRegion) profileRegion.textContent = region;
+    if (profileWatchtime) profileWatchtime.textContent = data?.watchtime || data?.tiempo_visto || "12h";
+  }
+
+  try {
+    const profilePayload = await getProfile();
+    const userData = profilePayload?.usuario || profilePayload?.user || profilePayload?.data || profilePayload;
+    renderProfile(userData);
+  } catch (error) {
+    renderProfile(session);
   }
 });
