@@ -698,6 +698,48 @@ flex-shrink: 0;
 }
 
 /* ==========================================================================
+Recuperación de contraseña
+========================================================================== */
+
+.auth-card__subtitle--compact {
+margin-bottom: 20px;
+}
+
+.form-message {
+display: none;
+width: 100%;
+margin-bottom: 18px;
+padding: 12px 14px;
+border-radius: var(--radius-sm);
+font-size: 13.5px;
+font-weight: 600;
+text-align: left;
+animation: fadeIn 0.35s var(--ease) both;
+}
+
+.form-message.is-visible {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.form-message--success {
+background: rgba(61, 220, 132, 0.12);
+border: 1px solid rgba(61, 220, 132, 0.38);
+color: #7eedaa;
+}
+
+.form-message--error {
+background: rgba(255, 133, 119, 0.12);
+border: 1px solid rgba(255, 133, 119, 0.32);
+color: var(--danger);
+}
+
+.field-group[data-field="confirmPassword"] {
+animation-delay: 0.34s;
+}
+
+/* ==========================================================================
 Home — interfaz de streaming
 ========================================================================== */
 
