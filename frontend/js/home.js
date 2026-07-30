@@ -195,14 +195,37 @@ document.addEventListener("DOMContentLoaded", async () => {
             <h2>${featured.title}</h2>
             <p>${featured.description}</p>
             <div class="home-hero__actions">
-              <button class="home-hero__button" type="button">Reproducir</button>
-              <button class="home-hero__button home-hero__button--ghost" type="button">
+              <a
+                class="home-hero__button"
+                href="reproductor.html?id=${featured.id}"
+              >
+                Reproducir
+              </a>
+              <button
+                id="hero-fav"
+                class="home-hero__button home-hero__button--ghost"
+                type="button"
+              >
                 Agregar a favoritos
               </button>
             </div>
           </div>
         </div>
       `;
+
+      const heroFav = document.getElementById("hero-fav");
+
+      if (heroFav) {
+        heroFav.addEventListener("click", async () => {
+          try {
+            await agregarFavorito(featured.id);
+            heroFav.textContent = "Guardado";
+            heroFav.disabled = true;
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+      }
     }
 
     if (normalized && !visibleItems.length) {

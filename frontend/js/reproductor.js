@@ -20,9 +20,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         document.getElementById("video-title").textContent = pelicula.titulo;
         document.getElementById("video-description").textContent = pelicula.descripcion;
-        document.getElementById("video-genre").textContent = pelicula.categoria;
-        document.getElementById("video-year").textContent = pelicula.anio;
-        document.getElementById("video-duration").textContent = pelicula.duracion + " min";
+        document.getElementById("detalle-categoria").textContent = pelicula.categoria;
+        document.getElementById("detalle-anio").textContent = pelicula.anio;
+        document.getElementById("detalle-duracion").textContent = pelicula.duracion + " min";
 
         const video = document.getElementById("video");
 
