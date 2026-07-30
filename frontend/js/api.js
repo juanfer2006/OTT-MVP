@@ -178,10 +178,22 @@ async function eliminarDislike(contenidoId) {
 
 }
 
-async function buscarContenido(texto){
+async function guardarHistorial(contenidoId, progresoSegundos) {
 
-    return apiRequest(`/busqueda?texto=${encodeURIComponent(texto)}`,{
-        method:"GET"
+    return apiRequest("/historial", {
+        method: "POST",
+        body: JSON.stringify({
+            contenido_id: contenidoId,
+            progreso_segundos: progresoSegundos
+        })
+    });
+
+}
+
+async function buscarContenido(texto) {
+
+    return apiRequest(`/contenido/buscar?q=${encodeURIComponent(texto)}`,{
+        method: "GET"
     });
 
 }

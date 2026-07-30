@@ -5,7 +5,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   const session = getSession();
-  const userName = session?.nombre || session?.name || session?.email?.split("@")[0] || "usuario";
+  const userName =
+    session?.nombre ||
+    session?.name ||
+    session?.email?.split("@")[0] ||
+    "usuario";
+
   const heroContainer = document.getElementById("hero");
   const rowsContainer = document.getElementById("rows");
   const searchInput = document.getElementById("search");
@@ -19,6 +24,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const CATEGORIAS = ["Acción", "Comedia", "Drama", "Terror", "Ciencia Ficción"];
 
+  // ── Normalización ────────────────────────────────────────────────────────────
+
   function normalizeItem(item) {
     return {
       id: item.id,
@@ -30,77 +37,83 @@ document.addEventListener("DOMContentLoaded", async () => {
       poster: `${API_BASE_URL}/static/portadas/${item.ruta_portada}`,
       video: `${API_BASE_URL}/static/peliculas/${item.ruta_video}`,
       rating: "★",
-      badge: "Nuevo"
+      badge: "Nuevo",
     };
   }
 
+  // ── Tarjeta estándar ─────────────────────────────────────────────────────────
+
   function createCard(item) {
     return `
-    <article class="home-card" data-id="${item.id}">
-      <a href="reproductor.html?id=${item.id}" class="home-card__link">
-        <div
-          class="home-card__poster"
-          style="
-            background-image:url('${item.poster}');
-            background-size:cover;
-            background-position:center;
-          "
-        >
-          <span class="home-card__badge">${item.badge}</span>
+      <article class="home-card" data-id="${item.id}">
+        <a href="reproductor.html?id=${item.id}" class="home-card__link">
+          <div
+            class="home-card__poster"
+            style="
+              background-image: url('${item.poster}');
+              background-size: cover;
+              background-position: center;
+            "
+          >
+            <span class="home-card__badge">${item.badge}</span>
+          </div>
+        </a>
+        <div class="home-card__content">
+          <div class="home-card__meta">
+            <span>${item.genre}</span>
+            <span>${item.year}</span>
+          </div>
+          <h3>${item.title}</h3>
+          <p>${item.description}</p>
+          <div class="home-card__footer">
+            <span>${item.duration}</span>
+            <span>★ ${item.rating}</span>
+          </div>
         </div>
-      </a>
-      <div class="home-card__content">
-        <div class="home-card__meta">
-          <span>${item.genre}</span>
-          <span>${item.year}</span>
-        </div>
-        <h3>${item.title}</h3>
-        <p>${item.description}</p>
-        <div class="home-card__footer">
-          <span>${item.duration}</span>
-          <span>★ ${item.rating}</span>
-        </div>
-      </div>
-    </article>
+      </article>
     `;
   }
 
-  // ── Seguir viendo ─────────────────────────────────────────
+  // ── Seguir viendo ────────────────────────────────────────────────────────────
+
   function createCardSeguirViendo(item) {
     const porcentaje = item.duracion_total
-      ? Math.min(Math.round((item.progreso_segundos / item.duracion_total) * 100), 100)
+      ? Math.min(
+          Math.round((item.progreso_segundos / item.duracion_total) * 100),
+          100
+        )
       : 0;
 
     return `
-    <article class="home-card" data-id="${item.id}">
-      <a href="reproductor.html?id=${item.id}" class="home-card__link">
-        <div
-          class="home-card__poster"
-          style="
-            background-image:url('${API_BASE_URL}/static/portadas/${item.ruta_portada}');
-            background-size:cover;
-            background-position:center;
-          "
-        >
-          <span class="home-card__badge">Continuar</span>
-          <div style="
-            position:absolute;
-            bottom:0;
-            left:0;
-            width:${porcentaje}%;
-            height:4px;
-            background:#e50914;
-          "></div>
+      <article class="home-card" data-id="${item.id}">
+        <a href="reproductor.html?id=${item.id}" class="home-card__link">
+          <div
+            class="home-card__poster"
+            style="
+              background-image: url('${API_BASE_URL}/static/portadas/${item.ruta_portada}');
+              background-size: cover;
+              background-position: center;
+            "
+          >
+            <span class="home-card__badge">Continuar</span>
+            <div style="
+              position: absolute;
+              bottom: 0;
+              left: 0;
+              width: ${porcentaje}%;
+              height: 4px;
+              background: #e50914;
+            "></div>
+          </div>
+        </a>
+        <div class="home-card__content">
+          <h3>${item.titulo}</h3>
+          <p>${item.descripcion}</p>
+          <div class="home-card__footer">
+            <span>${porcentaje}% visto</span>
+          </div>
         </div>
-      </a>
-      <div class="home-card__content">
-        <h3>${item.titulo}</h3>
-        <p>${item.descripcion}</p>
-        <div class="home-card__footer">
-          <span>${porcentaje}% visto</span>
-        </div>
-      </div>
-    </article>
+      </article>
     `;
   }
 
@@ -126,9 +139,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       return "";
     }
   }
-  // ──────────────────────────────────────────────────────────
 
-  // ── Categorías ────────────────────────────────────────────
+  // ── Categorías ───────────────────────────────────────────────────────────────
+
   async function renderCategorias() {
     let seccionesHTML = "";
 
@@ -156,10 +169,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     return seccionesHTML;
   }
-  // ──────────────────────────────────────────────────────────
+
+  // ── Renderizado del catálogo ─────────────────────────────────────────────────
 
   function renderCatalog(query = "") {
     const normalized = query.toLowerCase().trim();
+
     const visibleItems = catalogItems.filter((item) => {
       const hayMatch = [item.title, item.genre, item.description, item.year]
         .join(" ")
@@ -174,14 +189,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!normalized && visibleItems.length) {
       const featured = visibleItems[0];
       heroContainer.innerHTML = `
-        <div class="home-hero__panel" style="background:${featured.accent};">
+        <div class="home-hero__panel" style="background: ${featured.accent};">
           <div>
             <p class="home-hero__eyebrow">Hoy en StreamHub</p>
             <h2>${featured.title}</h2>
             <p>${featured.description}</p>
             <div class="home-hero__actions">
               <button class="home-hero__button" type="button">Reproducir</button>
-              <button class="home-hero__button home-hero__button--ghost" type="button">Agregar a favoritos</button>
+              <button class="home-hero__button home-hero__button--ghost" type="button">
+                Agregar a favoritos
+              </button>
             </div>
           </div>
         </div>
@@ -189,7 +206,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (normalized && !visibleItems.length) {
-      rowsContainer.innerHTML = '<p class="home-empty">No encontramos resultados para esa búsqueda.</p>';
+      rowsContainer.innerHTML =
+        '<p class="home-empty">No encontramos resultados para esa búsqueda.</p>';
       return;
     }
 
@@ -199,30 +217,49 @@ document.addEventListener("DOMContentLoaded", async () => {
           <h2>Recomendado para ti</h2>
           <a href="favoritos.html">Ver todos</a>
         </div>
-        <div class="home-grid">${visibleItems.map(createCard).join("")}</div>
+        <div class="home-grid">
+          ${visibleItems.map(createCard).join("")}
+        </div>
       </section>
       <div id="seguir-viendo-container"></div>
       <div id="categorias-container"></div>
     `;
 
     if (!normalized) {
-      // Cargar seguir viendo
-      renderSeguirViendo().then(html => {
+      renderSeguirViendo().then((html) => {
         const container = document.getElementById("seguir-viendo-container");
         if (container) container.innerHTML = html;
       });
 
-      // Cargar categorías
-      renderCategorias().then(html => {
+      renderCategorias().then((html) => {
         const container = document.getElementById("categorias-container");
         if (container) container.innerHTML = html;
       });
     }
   }
 
+  // ── Búsqueda ─────────────────────────────────────────────────────────────────
+
   if (searchInput) {
-    searchInput.addEventListener("input", (event) => renderCatalog(event.target.value));
+    searchInput.addEventListener("input", async (event) => {
+      const texto = event.target.value.trim();
+
+      if (texto === "") {
+        renderCatalog();
+        return;
+      }
+
+      try {
+        const respuesta = await buscarContenido(texto);
+        catalogItems = (respuesta.resultados || []).map(normalizeItem);
+        renderCatalog(texto);
+      } catch (error) {
+        console.error(error);
+      }
+    });
   }
+
+  // ── Navegación ───────────────────────────────────────────────────────────────
 
   document.getElementById("btn-home")?.addEventListener("click", () => {
     heroContainer.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -244,12 +281,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "index.html";
   });
 
+  // ── Carga inicial ────────────────────────────────────────────────────────────
+
   try {
     const payload = await getRecomendaciones();
     const source = payload?.recomendaciones || [];
     catalogItems = source.map(normalizeItem);
     renderCatalog();
   } catch (error) {
-    rowsContainer.innerHTML = `<p class="home-empty">${error.message || "No se pudo cargar el catálogo."}</p>`;
+    rowsContainer.innerHTML = `
+      <p class="home-empty">${error.message || "No se pudo cargar el catálogo."}</p>
+    `;
   }
 });

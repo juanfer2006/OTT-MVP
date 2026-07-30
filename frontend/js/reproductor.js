@@ -43,16 +43,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (e) {}
 
         // -------- GUARDAR PROGRESO CADA 10 SEGUNDOS --------
+
+        let ultimoGuardado = 0;
+
         video.addEventListener("timeupdate", () => {
-            if (Math.floor(video.currentTime) % 10 === 0 && video.currentTime > 0) {
+
+            const tiempo = Math.floor(video.currentTime);
+
+            if (tiempo - ultimoGuardado >= 10) {
+
+                ultimoGuardado = tiempo;
+
                 apiRequest("/historial", {
                     method: "POST",
                     body: JSON.stringify({
                         contenido_id: parseInt(id),
-                        progreso_segundos: Math.floor(video.currentTime)
+                        progreso_segundos: tiempo
                     })
                 }).catch(() => {});
+
             }
+
+        });
+
+        video.addEventListener("ended", () => {
+
+            apiRequest("/historial", {
+                method: "POST",
+                body: JSON.stringify({
+                    contenido_id: parseInt(id),
+                    progreso_segundos: Math.floor(video.duration)
+                })
+            }).catch(() => {});
+
         });
 
         // -------- GUARDAR PROGRESO AL PAUSAR --------
