@@ -8,13 +8,15 @@ def obtener_perfil(usuario_id):
 
     cursor.execute("""
         SELECT
-            id,
-            nombre,
-            apellido,
-            correo,
-            region_id
-        FROM usuario
-        WHERE id = %s
+            u.id,
+            u.nombre,
+            u.apellido,
+            u.correo,
+            r.nombre AS region
+        FROM usuario u
+        INNER JOIN region r
+            ON u.region_id = r.id
+        WHERE u.id = %s
     """, (usuario_id,))
 
     usuario = cursor.fetchone()

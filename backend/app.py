@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 
 from routes.regiones import regiones_bp
 from routes.auth import auth_bp
@@ -16,6 +17,7 @@ from routes.cerrar_sesion_routes import cerrar_sesion_bp
 from routes.perfil import perfil_bp
 
 app = Flask(__name__)
+CORS(app)
 
 app.register_blueprint(regiones_bp)
 app.register_blueprint(auth_bp)

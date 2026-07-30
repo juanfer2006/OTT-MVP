@@ -122,7 +122,15 @@ def iniciar_sesion(correo, contraseña):
     conexion.close()
 
     return {
-        "success": True,
-        "mensaje": "Inicio de sesión exitoso.",
-        "token": token
+    "success": True,
+    "mensaje": "Inicio de sesión exitoso.",
+    "token": token,
+    "usuario": {
+        "id": usuario["id"],
+        "nombre": usuario["nombre"],
+        "apellido": usuario["apellido"],
+        "correo": usuario["correo"],
+        "region_id": usuario["region_id"]
     }
+}
+
