@@ -5,7 +5,7 @@ const API_BASE_URL = (window.API_BASE_URL || "http://127.0.0.1:5000").replace(/\
 const API_ENDPOINTS = {
 login: window.API_ENDPOINTS?.login || "/login",
 register: window.API_ENDPOINTS?.register || "/registro",
-recoverPassword: window.API_ENDPOINTS?.recoverPassword || "/recuperar-password",
+recoverPassword: window.API_ENDPOINTS?.recoverPassword || "/recuperar-contraseña",
 profile: window.API_ENDPOINTS?.profile || "/perfil",
 catalog: window.API_ENDPOINTS?.catalog || "/contenido",
 favorites: window.API_ENDPOINTS?.favorites || "/favoritos"
@@ -14,6 +14,7 @@ favorites: window.API_ENDPOINTS?.favorites || "/favoritos"
 function getRegisteredUsers() {
 return [];
 }
+
 
 function saveRegisteredUsers() {
 localStorage.removeItem(STREAMHUB_USERS_KEY);
@@ -80,21 +81,23 @@ return session;
 }
 
 async function registerUser(user) {
-const payload = await apiRequest(API_ENDPOINTS.register, {
-    method: "POST",
-    body: JSON.stringify({
-    nombre: user.nombre || user.name || "",
-    correo: user.email,
-    email: user.email,
-    password: user.password,
-    contraseña: user.password,
-    region: user.region || ""
-    })
-});
+    const payload = await apiRequest(API_ENDPOINTS.register, {
+        method: "POST",
+        body: JSON.stringify({
+            nombre: user.nombre || user.name || "",
+            apellido: user.apellido || user.lastName || "",  // ← agregar
+            correo: user.email,
+            email: user.email,
+            password: user.password,
+            contraseña: user.password,
+            region: user.region || "",
+            region_id: user.region_id || user.region || 1
+        })
+    });
 
-const session = normalizeSessionPayload(payload);
-saveSession(session);
-return session;
+    const session = normalizeSessionPayload(payload);
+    saveSession(session);
+    return session;
 }
 
 async function requestPasswordRecovery(email, newPassword) {
@@ -125,6 +128,12 @@ async function getFavorites() {
 return apiRequest(API_ENDPOINTS.favorites, { method: "GET" });
 }
 
+async function getRecomendaciones() {
+    return apiRequest("/recomendaciones", {
+        method: "GET"
+    });
+}
+
 async function agregarFavorito(contenidoId) {
 
     return apiRequest(API_ENDPOINTS.favorites, {
@@ -134,6 +143,12 @@ async function agregarFavorito(contenidoId) {
         })
     });
 
+}
+
+async function getContenidoPorCategoria(categoria) {
+    return apiRequest(`/contenido/categoria/${encodeURIComponent(categoria)}`, {
+        method: "GET"
+    });
 }
 
 async function eliminarFavorito(contenidoId) {

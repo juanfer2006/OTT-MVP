@@ -17,6 +17,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let catalogItems = [];
 
+  // Categorías disponibles
+  const CATEGORIAS = ["Acción", "Comedia", "Drama", "Terror", "Ciencia Ficción"];
+
   function normalizeItem(item) {
     return {
       id: item.id,
@@ -25,26 +28,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       duration: `${item.duracion} min`,
       genre: item.categoria,
       description: item.descripcion,
-
       poster: `${API_BASE_URL}/static/portadas/${item.ruta_portada}`,
       video: `${API_BASE_URL}/static/peliculas/${item.ruta_video}`,
-
       rating: "★",
       badge: "Nuevo"
     };
-  }
-
-  function normalizeCatalogPayload(payload) {
-    const source = payload?.contenido || payload?.items || payload?.peliculas || payload?.data || payload;
-    if (Array.isArray(source)) {
-      return source.map(normalizeItem);
-    }
-
-    if (Array.isArray(payload?.results)) {
-      return payload.results.map(normalizeItem);
-    }
-
-    return [];
   }
 
   function createCard(item) {
@@ -59,7 +47,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             background-position:center;
           "
         >
-        
           <span class="home-card__badge">${item.badge}</span>
         </div>
       </a>
@@ -79,6 +66,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 
+  // ── Renderizar sección de categorías ──────────────────────
+  async function renderCategorias() {
+    let seccionesHTML = "";
+
+    for (const categoria of CATEGORIAS) {
+      try {
+        const payload = await getContenidoPorCategoria(categoria);
+        const peliculas = (payload?.contenido || []).map(normalizeItem);
+
+        if (peliculas.length === 0) continue;
+
+        seccionesHTML += `
+          <section class="home-row" aria-label="${categoria}">
+            <div class="home-row__head">
+              <h2>${categoria}</h2>
+            </div>
+            <div class="home-grid">
+              ${peliculas.map(createCard).join("")}
+            </div>
+          </section>
+        `;
+      } catch (error) {
+        console.error(`Error cargando categoría ${categoria}:`, error);
+      }
+    }
+
+    return seccionesHTML;
+  }
+  // ──────────────────────────────────────────────────────────
+
   function renderCatalog(query = "") {
     const normalized = query.toLowerCase().trim();
     const visibleItems = catalogItems.filter((item) => {
@@ -86,7 +103,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         .join(" ")
         .toLowerCase()
         .includes(normalized);
-
       return normalized ? hayMatch : true;
     });
 
@@ -115,15 +131,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    // Sección de recomendados
     rowsContainer.innerHTML = `
       <section class="home-row" aria-label="Contenido recomendado">
         <div class="home-row__head">
-          <h2>Contenido recomendado</h2>
+          <h2>Recomendado para ti</h2>
           <a href="favoritos.html">Ver todos</a>
         </div>
         <div class="home-grid">${visibleItems.map(createCard).join("")}</div>
       </section>
+      <div id="categorias-container"></div>
     `;
+
+    // Cargar categorías debajo de recomendados (solo si no hay búsqueda)
+    if (!normalized) {
+      renderCategorias().then(html => {
+        const container = document.getElementById("categorias-container");
+        if (container) container.innerHTML = html;
+      });
+    }
   }
 
   if (searchInput) {
@@ -143,24 +169,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   document.getElementById("btn-logout")?.addEventListener("click", async () => {
-
     try {
-
-      await apiRequest("/cerrar_sesion", {
-        method: "POST"
-      });
-
+      await apiRequest("/cerrar-sesion", { method: "POST" });
     } catch (e) {}
-
     clearSession();
-
     window.location.href = "index.html";
-
   });
 
   try {
-    const payload = await getCatalog();
-    catalogItems = normalizeCatalogPayload(payload);
+    const payload = await getRecomendaciones();
+    const source = payload?.recomendaciones || [];
+    catalogItems = source.map(normalizeItem);
     renderCatalog();
   } catch (error) {
     rowsContainer.innerHTML = `<p class="home-empty">${error.message || "No se pudo cargar el catálogo."}</p>`;
