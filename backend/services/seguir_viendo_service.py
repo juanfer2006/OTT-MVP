@@ -22,6 +22,9 @@ def obtener_seguir_viendo(usuario_id):
 
         WHERE h.usuario_id = %s
 
+        GROUP BY c.id, c.titulo, c.descripcion, c.ruta_portada, c.ruta_video,
+             h.progreso_segundos, h.ultima_vez
+
         ORDER BY h.ultima_vez DESC
     """, (usuario_id,))
 
