@@ -19,15 +19,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function normalizeItem(item) {
     return {
-      id: item.id || item._id || item.slug || `${item.title || item.name || "item"}-${Math.random()}`,
-      title: item.title || item.name || item.titulo || "Sin título",
-      year: item.year || item.anio || "—",
-      duration: item.duration || item.duracion || "Sin datos",
-      rating: item.rating || item.calificacion || "—",
-      genre: item.genre || item.genero || "Sin género",
-      description: item.description || item.descripcion || "Sin descripción",
-      accent: item.accent || item.color || "linear-gradient(135deg, #ff6a45 0%, #2f4dff 100%)",
-      badge: item.badge || item.etiqueta || "Nuevo"
+      id: item.id,
+      title: item.titulo,
+      year: item.anio,
+      duration: `${item.duracion} min`,
+      genre: item.categoria,
+      description: item.descripcion,
+
+      poster: `${API_BASE_URL}/static/portadas/${item.ruta_portada}`,
+      video: `${API_BASE_URL}/static/peliculas/${item.ruta_video}`,
+
+      rating: "★",
+      badge: "Nuevo"
     };
   }
 
@@ -47,8 +50,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   function createCard(item) {
     return `
     <article class="home-card" data-id="${item.id}">
-      <a href="reproductor.html" class="home-card__link">
-        <div class="home-card__poster" style="background:${item.accent};">
+      <a href="reproductor.html?id=${item.id}" class="home-card__link">
+        <div
+          class="home-card__poster"
+          style="
+            background-image:url('${item.poster}');
+            background-size:cover;
+            background-position:center;
+          "
+        >
+        
           <span class="home-card__badge">${item.badge}</span>
         </div>
       </a>
@@ -131,9 +142,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "perfil.html";
   });
 
-  document.getElementById("btn-logout")?.addEventListener("click", () => {
+  document.getElementById("btn-logout")?.addEventListener("click", async () => {
+
+    try {
+
+      await apiRequest("/cerrar_sesion", {
+        method: "POST"
+      });
+
+    } catch (e) {}
+
     clearSession();
+
     window.location.href = "index.html";
+
   });
 
   try {

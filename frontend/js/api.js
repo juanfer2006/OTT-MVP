@@ -115,8 +115,60 @@ async function getCatalog() {
 return apiRequest(API_ENDPOINTS.catalog, { method: "GET" });
 }
 
+async function getContenido(id) {
+  return apiRequest(`/contenido/${id}`, {
+    method: "GET"
+  });
+}
+
 async function getFavorites() {
 return apiRequest(API_ENDPOINTS.favorites, { method: "GET" });
+}
+
+async function agregarFavorito(contenidoId) {
+
+    return apiRequest(API_ENDPOINTS.favorites, {
+        method: "POST",
+        body: JSON.stringify({
+            contenido_id: contenidoId
+        })
+    });
+
+}
+
+async function eliminarFavorito(contenidoId) {
+
+    return apiRequest(`${API_ENDPOINTS.favorites}/${contenidoId}`, {
+        method: "DELETE"
+    });
+
+}
+
+async function agregarDislike(contenidoId) {
+
+    return apiRequest("/dislikes", {
+        method: "POST",
+        body: JSON.stringify({
+            contenido_id: contenidoId
+        })
+    });
+
+}
+
+async function eliminarDislike(contenidoId) {
+
+    return apiRequest(`/dislikes/${contenidoId}`, {
+        method: "DELETE"
+    });
+
+}
+
+async function buscarContenido(texto){
+
+    return apiRequest(`/busqueda?texto=${encodeURIComponent(texto)}`,{
+        method:"GET"
+    });
+
 }
 
 function saveSession(user) {
