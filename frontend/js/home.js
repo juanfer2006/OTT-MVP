@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let catalogItems = [];
 
-  // Categorías disponibles
   const CATEGORIAS = ["Acción", "Comedia", "Drama", "Terror", "Ciencia Ficción"];
 
   function normalizeItem(item) {
@@ -66,7 +65,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
   }
 
-  // ── Renderizar sección de categorías ──────────────────────
+  // ── Seguir viendo ─────────────────────────────────────────
+  function createCardSeguirViendo(item) {
+    const porcentaje = item.duracion_total
+      ? Math.min(Math.round((item.progreso_segundos / item.duracion_total) * 100), 100)
+      : 0;
+
+    return `
+    <article class="home-card" data-id="${item.id}">
+      <a href="reproductor.html?id=${item.id}" class="home-card__link">
+        <div
+          class="home-card__poster"
+          style="
+            background-image:url('${API_BASE_URL}/static/portadas/${item.ruta_portada}');
+            background-size:cover;
+            background-position:center;
+          "
+        >
+          <span class="home-card__badge">Continuar</span>
+          <div style="
+            position:absolute;
+            bottom:0;
+            left:0;
+            width:${porcentaje}%;
+            height:4px;
+            background:#e50914;
+          "></div>
+        </div>
+      </a>
+      <div class="home-card__content">
+        <h3>${item.titulo}</h3>
+        <p>${item.descripcion}</p>
+        <div class="home-card__footer">
+          <span>${porcentaje}% visto</span>
+        </div>
+      </div>
+    </article>
+    `;
+  }
+
+  async function renderSeguirViendo() {
+    try {
+      const payload = await apiRequest("/seguir-viendo", { method: "GET" });
+      const items = payload?.contenido || [];
+
+      if (items.length === 0) return "";
+
+      return `
+        <section class="home-row" aria-label="Seguir viendo">
+          <div class="home-row__head">
+            <h2>Seguir viendo</h2>
+          </div>
+          <div class="home-grid">
+            ${items.map(createCardSeguirViendo).join("")}
+          </div>
+        </section>
+      `;
+    } catch (error) {
+      console.error("Error cargando seguir viendo:", error);
+      return "";
+    }
+  }
+  // ──────────────────────────────────────────────────────────
+
+  // ── Categorías ────────────────────────────────────────────
   async function renderCategorias() {
     let seccionesHTML = "";
 
@@ -131,7 +193,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    // Sección de recomendados
     rowsContainer.innerHTML = `
       <section class="home-row" aria-label="Contenido recomendado">
         <div class="home-row__head">
@@ -140,11 +201,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
         <div class="home-grid">${visibleItems.map(createCard).join("")}</div>
       </section>
+      <div id="seguir-viendo-container"></div>
       <div id="categorias-container"></div>
     `;
 
-    // Cargar categorías debajo de recomendados (solo si no hay búsqueda)
     if (!normalized) {
+      // Cargar seguir viendo
+      renderSeguirViendo().then(html => {
+        const container = document.getElementById("seguir-viendo-container");
+        if (container) container.innerHTML = html;
+      });
+
+      // Cargar categorías
       renderCategorias().then(html => {
         const container = document.getElementById("categorias-container");
         if (container) container.innerHTML = html;
